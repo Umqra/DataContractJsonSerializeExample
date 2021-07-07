@@ -4,12 +4,12 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
 
-namespace datacontract_bug
+namespace DataContractJsonSerializeExample
 {
     [DataContract]
     public class ContractGeneric : IExtensibleDataObject
     {
-        public ExtensionDataObject? ExtensionData { get; set; }
+        public ExtensionDataObject ExtensionData { get; set; }
     }
 
     [DataContract]
@@ -51,15 +51,19 @@ namespace datacontract_bug
 
         public static string ToJson<T>(T value)
         {
-            using var memoryStream = new MemoryStream();
-            new DataContractJsonSerializer(typeof(T)).WriteObject(memoryStream, value);
-            return Encoding.UTF8.GetString(memoryStream.ToArray());
+            using (var memoryStream = new MemoryStream())
+            {
+                new DataContractJsonSerializer(typeof(T)).WriteObject(memoryStream, value);
+                return Encoding.UTF8.GetString(memoryStream.ToArray());
+            }
         }
 
         public static T FromJson<T>(string json)
         {
-            using var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
-            return (T) new DataContractJsonSerializer(typeof(T)).ReadObject(memoryStream);
+            using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json)))
+            {
+                return (T) new DataContractJsonSerializer(typeof(T)).ReadObject(memoryStream);
+            }
         }
     }
 }
